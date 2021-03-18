@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -24,16 +25,17 @@ func main() {
 	args := os.Args[1:]
 
 	if len(args) < 2 {
-		fmt.Println("usage: public-fixer <base-public.xml> [other-public.xml]")
+		fmt.Println("usage: public-fixer <path/to/base> [other-public.xml]")
 		os.Exit(1)
 	}
 
 	base := args[0]
 	other := args[1:]
 
-	baseResources := xmlify(base)
+	baseResources := xmlify(base + "/res/values/public.xml")
 
-	missingMap := make(map[string]int) // map id to index in baseResources
+	missingMap := make(map[string]int)    // map id to index in baseResources
+	changedMap := make(map[string]string) // map old name to new name
 
 	for i := 0; i < len(baseResources.Public); i++ {
 		public := baseResources.Public[i]
@@ -58,9 +60,10 @@ func main() {
 				if strings.HasPrefix(name, "APKTOOL_DUMMY_") {
 					fmt.Println("Found id, but it's also a dummy:", id)
 				} else {
-					fmt.Println(id, "->", name)
+					oldName := baseResources.Public[baseIndex].Name
 					baseResources.Public[baseIndex].Name = name
 					delete(missingMap, id)
+					changedMap[oldName] = name
 				}
 			}
 		}
@@ -70,7 +73,39 @@ func main() {
 		fmt.Println("Still", val, "missing names")
 	}
 
-	writexml(base, baseResources)
+	// replace in all xml files
+	err := filepath.Walk(base+"/res",
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !strings.HasSuffix(info.Name(), ".xml") {
+				return nil
+			}
+			file, err := os.OpenFile(path, os.O_RDWR, 0644)
+			handleErr(err)
+
+			bytes, err := ioutil.ReadAll(file)
+			handleErr(err)
+
+			str := string(bytes)
+
+			for old, newv := range changedMap {
+				str = strings.ReplaceAll(str, old + "\"", newv + "\"")
+				str = strings.ReplaceAll(str, old + "<", newv + "<")
+			}
+
+			err = file.Truncate(0)
+			handleErr(err)
+			_, err = file.WriteAt([]byte(str), 0)
+			handleErr(err)
+
+			err = file.Close()
+			handleErr(err)
+			return nil
+		})
+	handleErr(err)
+
 }
 
 func xmlify(path string) Resources {
@@ -84,21 +119,6 @@ func xmlify(path string) Resources {
 	handleErr(err)
 
 	return resources
-}
-
-func writexml(path string, res Resources) {
-	bytes, err := xml.MarshalIndent(res, "", "    ")
-	handleErr(err)
-	str := string(bytes)
-	str = strings.ReplaceAll(str, "></public>", " />")
-	str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + str
-
-	file, err := os.OpenFile(path, os.O_WRONLY, 0644)
-	handleErr(err)
-
-	_, err = file.WriteString(str)
-	handleErr(err)
-	file.Close()
 }
 
 func handleErr(err error) {
