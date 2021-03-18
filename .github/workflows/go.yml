@@ -40,3 +40,5 @@ jobs:
         asset_path: ./public-fixer
         asset_name: public-fixer
         asset_content_type: application/x-executable
+    - name: print checksum
+      run: shasum public-fixer
