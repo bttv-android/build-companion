@@ -37,6 +37,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./main
+        asset_path: ./public-fixer
         asset_name: public-fixer
-          asset_content_type: application/vnd.android.package-archive
+        asset_content_type: application/x-executable
