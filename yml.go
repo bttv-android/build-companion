@@ -88,10 +88,9 @@ func getPreAndPostDNC(path string) (string, string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if state == "pre" {
+			preStr += line + "\n"
 			if strings.HasSuffix(line, "doNotCompress:") {
 				state = "in"
-			} else {
-				preStr += line + "\n"
 			}
 		} else if state == "in" {
 			if strings.HasPrefix(line, "- ") {
