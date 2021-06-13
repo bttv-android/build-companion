@@ -13,7 +13,7 @@ func Fix() {
 	args := os.Args[2:]
 
 	if len(args) < 2 {
-		fmt.Println("usage: public-fixer fix <path/to/base> [other-public.xml]")
+		fmt.Println("usage: build-companion fix <path/to/base> [other-public.xml]")
 		os.Exit(1)
 	}
 

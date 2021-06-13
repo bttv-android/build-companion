@@ -11,7 +11,7 @@ import (
 func ids() {
 	args := os.Args
 	if len(args) <= 2 {
-		println("usage: public-fixer ids <path/to/public.xml>")
+		println("usage: build-companion ids <path/to/public.xml>")
 		os.Exit(1)
 	}
 	publicxml := args[2]

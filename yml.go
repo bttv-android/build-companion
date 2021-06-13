@@ -13,7 +13,7 @@ func Yml() {
 	args := os.Args[2:]
 
 	if len(args) < 2 {
-		fmt.Println("usage: public-fixer yml <path/to/base> [other-apktool.yml]")
+		fmt.Println("usage: build-companion yml <path/to/base> [other-apktool.yml]")
 		os.Exit(1)
 	}
 
