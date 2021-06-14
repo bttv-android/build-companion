@@ -63,9 +63,10 @@ type stringsxml struct {
 }
 
 type stringxmlelement struct {
-	XMLName xml.Name `xml:"string"`
-	Name    string   `xml:"name,attr"`
-	Value      string   `xml:",chardata"`
+	XMLName   xml.Name `xml:"string"`
+	Name      string   `xml:"name,attr"`
+	Value     string   `xml:",chardata"`
+	Formatted string   `xml:"formatted,attr,omitempty"`
 }
 
 func handleFile(ourStringsXmlPath, theirStringsXmlPath string) {
@@ -87,6 +88,7 @@ func handleFile(ourStringsXmlPath, theirStringsXmlPath string) {
 				XMLName: theirxml.Stringxmlelements[0].XMLName,
 				Name:    el.Name,
 				Value:   el.Value,
+				Formatted: "",
 			})
 		} else if theirxml.Stringxmlelements[i].Value != el.Value {
 			fmt.Println("overwriting", el.Name, "in", theirStringsXmlPath)

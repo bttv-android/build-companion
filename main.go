@@ -36,7 +36,7 @@ func main() {
 	case "strings":
 		Strings()
 	default:
-		fmt.Println("build-companion 5.1.0")
+		fmt.Println("build-companion 5.1.1")
 		fmt.Println("available commands:")
 		fmt.Println("* fix - find and replace all placeholders in xml files")
 		fmt.Println("* yml - add DNC of splits to base apktool.yml")
