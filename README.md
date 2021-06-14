@@ -8,3 +8,4 @@ It's only intended to be used in the bttv project please don't file issues for o
 * fix - find and replace all placeholders in xml files
 * yml - add DNC of splits to base apktool.yml
 * ids - recalculate the ids of bttv_ prefixed values in public.xml
+* strings - find and add strings from mod directory
