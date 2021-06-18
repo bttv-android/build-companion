@@ -65,7 +65,7 @@ type stringsxml struct {
 type stringxmlelement struct {
 	XMLName   xml.Name `xml:"string"`
 	Name      string   `xml:"name,attr"`
-	Value     string   `xml:",chardata"`
+	Value     string   `xml:",innerxml"`
 	Formatted string   `xml:"formatted,attr,omitempty"`
 }
 
