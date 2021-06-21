@@ -97,7 +97,7 @@ func handleFile(ourStringsXmlPath, theirStringsXmlPath string) {
 	}
 
 	str := "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-	res, err := xml.MarshalIndent(theirxml, "", "  ")
+	res, err := xml.MarshalIndent(theirxml, "", "    ")
 	handleErr(err)
 	str = str + string(res)
 
