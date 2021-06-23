@@ -58,15 +58,29 @@ func createCopy(from, to string) {
 }
 
 type stringsxml struct {
-	XMLName           xml.Name           `xml:"resources"`
-	Stringxmlelements []stringxmlelement `xml:"string"`
+	XMLName              xml.Name             `xml:"resources"`
+	StringXMLElements    []stringXMLElement   `xml:"string"`
+	StringArraysElements []stringArrayElement `xml:"string-array"`
+	PluralElements 		 []pluralsElement 	  `xml:"plurals"`
 }
 
-type stringxmlelement struct {
+type stringXMLElement struct {
 	XMLName   xml.Name `xml:"string"`
 	Name      string   `xml:"name,attr"`
 	Value     string   `xml:",innerxml"`
 	Formatted string   `xml:"formatted,attr,omitempty"`
+}
+
+type pluralsElement struct {
+	XMLName   xml.Name `xml:"string"`
+	Name      string   `xml:"name,attr"`
+	Value     string   `xml:",innerxml"`
+}
+
+type stringArrayElement struct {
+	XMLName xml.Name `xml:"string-array"`
+	Name    string   `xml:"name,attr"`
+	Value   string   `xml:",innerxml"`
 }
 
 func handleFile(ourStringsXmlPath, theirStringsXmlPath string) {
@@ -75,24 +89,62 @@ func handleFile(ourStringsXmlPath, theirStringsXmlPath string) {
 
 	theirxmlmap := make(map[string]int)
 
-	for i, el := range theirxml.Stringxmlelements {
+	for i, el := range theirxml.StringXMLElements {
+		theirxmlmap[el.Name] = i
+	}
+	for i, el := range theirxml.PluralElements {
+		theirxmlmap[el.Name] = i
+	}
+	for i, el := range theirxml.StringArraysElements {
 		theirxmlmap[el.Name] = i
 	}
 
-	for _, el := range oursxml.Stringxmlelements {
+	for _, el := range oursxml.StringXMLElements {
 		i, got := theirxmlmap[el.Name]
 
 		if !got {
 			fmt.Println(ourStringsXmlPath, "has", el.Name, theirStringsXmlPath, "does not, creating new element...")
-			theirxml.Stringxmlelements = append(theirxml.Stringxmlelements, stringxmlelement{
-				XMLName: theirxml.Stringxmlelements[0].XMLName,
-				Name:    el.Name,
-				Value:   el.Value,
+			theirxml.StringXMLElements = append(theirxml.StringXMLElements, stringXMLElement{
+				XMLName:   theirxml.StringXMLElements[0].XMLName,
+				Name:      el.Name,
+				Value:     el.Value,
 				Formatted: "",
 			})
-		} else if theirxml.Stringxmlelements[i].Value != el.Value {
+		} else if theirxml.StringXMLElements[i].Value != el.Value {
 			fmt.Println("overwriting", el.Name, "in", theirStringsXmlPath)
-			theirxml.Stringxmlelements[i].Value = el.Value
+			theirxml.StringXMLElements[i].Value = el.Value
+		}
+	}
+
+	for _, el := range oursxml.StringArraysElements {
+		i, got := theirxmlmap[el.Name]
+
+		if !got {
+			fmt.Println(ourStringsXmlPath, "has", el.Name, theirStringsXmlPath, "does not, creating new element...")
+			theirxml.StringArraysElements = append(theirxml.StringArraysElements, stringArrayElement{
+				XMLName:   theirxml.StringArraysElements[0].XMLName,
+				Name:      el.Name,
+				Value:     el.Value,
+			})
+		} else if theirxml.StringArraysElements[i].Value != el.Value {
+			fmt.Println("overwriting", el.Name, "in", theirStringsXmlPath)
+			theirxml.StringArraysElements[i].Value = el.Value
+		}
+	}
+
+	for _, el := range oursxml.PluralElements {
+		i, got := theirxmlmap[el.Name]
+
+		if !got {
+			fmt.Println(ourStringsXmlPath, "has", el.Name, theirStringsXmlPath, "does not, creating new element...")
+			theirxml.PluralElements = append(theirxml.PluralElements, pluralsElement{
+				XMLName:   theirxml.PluralElements[0].XMLName,
+				Name:      el.Name,
+				Value:     el.Value,
+			})
+		} else if theirxml.PluralElements[i].Value != el.Value {
+			fmt.Println("overwriting", el.Name, "in", theirStringsXmlPath)
+			theirxml.PluralElements[i].Value = el.Value
 		}
 	}
 
